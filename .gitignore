@@ -1,0 +1,10 @@
+
+cvStructuredLight/cvStructuredLight.sdf
+
+cvStructuredLight/Debug/
+cvStructuredLight/Release/
+cvStructuredLight/ipch/
+cvStructuredLight/cvStructuredLight/Debug/
+cvStructuredLight/cvStructuredLight/output/
+cvStructuredLight/cvStructuredLight/opencv_release.props
+cvStructuredLight/cvStructuredLight/opencv2410_x86_debug.props
