@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<opencv_storage>
+
+<board_width>7</board_width>
+<board_height>8</board_height>
+<square_length>20</square_length>
+<square_height>20</square_height>
+<cludenum>8</cludenum>
+<!--水平和竖直扫描点云片数-->
+<horizontalScanNum>2</horizontalScanNum>
+<verticalScanNum>1</verticalScanNum>
+<risingDistance>10</risingDistance>
+
+<!--0:粗拼接 1：粗拼接+icp-->
+<HorizontalRegistrationModel>3</HorizontalRegistrationModel>
+<VerticalRegistrationModel>3</VerticalRegistrationModel>
+<Camera_ID>0</Camera_ID>
+<KSearchnum>30</KSearchnum>
+<MaxCorrespondenceDistance>0.5</MaxCorrespondenceDistance>
+<LeafSize>0.5</LeafSize>
+<TransformationEpsilon>1e-2</TransformationEpsilon>
+<downsample_flag>1</downsample_flag>
+<Cali_Pic_Num>3</Cali_Pic_Num>
+
+</opencv_storage>

@@ -8,3 +8,17 @@ cvStructuredLight/cvStructuredLight/Debug/
 cvStructuredLight/cvStructuredLight/output/
 cvStructuredLight/cvStructuredLight/opencv_release.props
 cvStructuredLight/cvStructuredLight/opencv2410_x86_debug.props
+
+PointCloudRegistration/Debug/
+PointCloudRegistration/ipch/
+PointCloudRegistration/PointCloudRegistration.v12.suo
+PointCloudRegistration/PointCloudRegistration/Debug/
+PointCloudRegistration/PointCloudRegistration/result/
+
+*.props
+
+PointCloudRegistration/PointCloudRegistration/PointCloudRegistration.vcxproj.filters
+PointCloudRegistration/PointCloudRegistration/PointCloudRegistration.vcxproj.user
+PointCloudRegistration/PointCloudRegistration.opensdf
+PointCloudRegistration/PointCloudRegistration.sdf
+PointCloudRegistration/PointCloudRegistration/PointCloudRegistration.vcxproj

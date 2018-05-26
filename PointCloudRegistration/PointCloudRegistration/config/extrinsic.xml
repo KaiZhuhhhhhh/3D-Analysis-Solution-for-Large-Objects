@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<opencv_storage>
+<!--extrinsic1 表示从1号设备到2号设备的空间变换矩阵1T2-->
+<extrinsic1 type_id="opencv-matrix">
+  <rows>4</rows>
+  <cols>4</cols>
+  <dt>d</dt>
+  <data>
+    1.0 0.0 0.0 0.5
+    0.0 1.0 0.0 0.5
+    0.0 0.0 1.0 0.5
+    0.0 0.0 0.0 0.1</data></extrinsic1>
+<translation type_id="opencv-matrix">
+  <rows>4</rows>
+  <cols>4</cols>
+  <dt>d</dt>
+  <data>
+    1.0 0.0 0.0 0.5
+    0.0 1.0 0.0 10.5
+    0.0 0.0 1.0 0.5
+    0.0 0.0 0.0 0.1</data></translation>
+
+
+</opencv_storage>
