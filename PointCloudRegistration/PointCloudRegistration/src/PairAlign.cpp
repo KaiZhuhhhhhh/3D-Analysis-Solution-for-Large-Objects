@@ -3,7 +3,8 @@
 #include "stdafx.h"
 #include "PairAlign.h"
 #include "Config.h"
-//#include "Calibrate.h"
+#include <pcl/point_cloud.h>
+#include "pointCloudProcess.h"
 
 #include <boost/make_shared.hpp> //共享指针
 //点/点云
@@ -127,7 +128,7 @@ void loadData(int argc, char **argv, std::vector<PCD, Eigen::aligned_allocator<P
 {
 	std::string extension(".ply"); //声明并初始化string类型变量extension，表示文件后缀名
 	// 通过遍历文件名，读取pcd文件
-	for (int i = 1; i < argc; i++) //遍历所有的文件名（略过程序名）
+	for (int i = 0; i < argc; i++) //遍历所有的文件名（略过程序名）
 	{
 		std::string fname = std::string(argv[i]);
 		if (fname.size() <= extension.size()) //文件名的长度是否符合要求
@@ -154,6 +155,58 @@ void loadData(int argc, char **argv, std::vector<PCD, Eigen::aligned_allocator<P
 			std::vector<int> indices; //保存去除的点的索引
 			pcl::removeNaNFromPointCloud(*m.cloud, *m.cloud, indices); //去除点云中的NaN点
 
+			models.push_back(m);
+		}
+	}
+	//检查用户数据
+	if (models.empty())
+	{
+		PCL_ERROR("Syntax is: %s <source.pcd> <target.pcd> [*]", argv[0]); //语法
+		PCL_ERROR("[*] - multiple files can be added. The registration results of (i, i+1) will be registered against (i+2), etc"); //可以使用多个文件
+	}
+	PCL_INFO("Loaded %d datasets.", (int)models.size()); //显示读取了多少个点云文件
+}
+
+
+void loadData2(int argc, std::string argv[12], std::vector<PCD, Eigen::aligned_allocator<PCD> > &models)
+{
+	std::string extension(".ply"); //声明并初始化string类型变量extension，表示文件后缀名
+	// 通过遍历文件名，读取pcd文件
+	for (int i = 0; i < argc; i++) //遍历所有的文件名（略过程序名）
+	{
+		PointCloud::Ptr cloud(new pcl::PointCloud<PointT>);
+		pcl::PointCloud<PointT>::Ptr cloud_downSampled(new pcl::PointCloud<PointT>);
+		pcl::PointCloud<PointT>::Ptr cloud_filtered(new pcl::PointCloud<PointT>);
+		std::string fname = argv[i];
+		if (fname.size() <= extension.size()) //文件名的长度是否符合要求
+			continue;
+
+		std::transform(fname.begin(), fname.end(), fname.begin(), (int(*)(int))tolower); //将某操作(小写字母化)应用于指定范围的每个元素
+		//检查文件是否是xxx文件
+		if (fname.compare(fname.size() - extension.size(), extension.size(), extension) == 0)
+		{
+			// 读取点云，并保存到models
+			PCD m;
+			m.f_name = argv[i];
+			if (extension == ".ply")
+			{
+				pcl::PLYReader reader;
+				if (reader.read(argv[i], *m.cloud) < 0)
+					std::cout << "打开失败" << endl;
+			}
+			else if (extension == ".pcd")
+			{
+				pcl::io::loadPCDFile(argv[i], *m.cloud); //读取点云数据
+			}
+			//去除点云中的NaN点（xyz都是NaN）
+			std::vector<int> indices; //保存去除的点的索引
+			pcl::removeNaNFromPointCloud(*m.cloud, *m.cloud, indices); //去除点云中的NaN点
+			if (pCP.downsample_flag == true){
+				downSample(m.cloud, m.cloud);//下采样
+			}
+			if (pCP.filter_flag == true){
+				filterPointCloud(m.cloud, m.cloud);//去除离群点
+			}
 			models.push_back(m);
 		}
 	}
@@ -209,7 +262,7 @@ void pairAlign(const PointCloud::Ptr cloud_src, const PointCloud::Ptr cloud_tgt,
 	PointCloudWithNormals::Ptr points_with_normals_src(new PointCloudWithNormals); //创建源点云指针（注意点的类型包含坐标和法向量）
 	PointCloudWithNormals::Ptr points_with_normals_tgt(new PointCloudWithNormals); //创建目标点云指针（注意点的类型包含坐标和法向量）
 	pcl::NormalEstimation<PointT, PointNormalT> norm_est; //该对象用于计算法向量
-	pcl::search::KdTree<pcl::PointXYZ>::Ptr tree(new pcl::search::KdTree<pcl::PointXYZ>()); //创建kd树，用于计算法向量的搜索方法
+	pcl::search::KdTree<pcl::PointXYZRGB>::Ptr tree(new pcl::search::KdTree<pcl::PointXYZRGB>()); //创建kd树，用于计算法向量的搜索方法
 	norm_est.setSearchMethod(tree); //设置搜索方法
 	norm_est.setKSearch(KSearchnum); //设置最近邻的数量
 	norm_est.setInputCloud(src); //设置输入云
@@ -393,7 +446,7 @@ void HorizontalAccurateRegistration(std::vector<PCD, Eigen::aligned_allocator<PC
 		*source = *result; //源点云
 		target = data_temp[i].cloud; //目标点云
 		PointCloud::Ptr temptest(new PointCloud); //创建临时点云指针
-
+		CvMatToMatrix4fzk(&(Eigen_extrinsic[i - 1]), &(extrinsic[i - 1]));
 		roughTranslation(source, Eigen_extrinsic[i - 1], 1);//将1点云移动到下一点云的位置		
 
 		showCloudsLeft(source, target); //在左视区，简单的显示源点云和目标点云		
@@ -459,6 +512,8 @@ void VerticalAccurateRegistration(std::vector<PCD, Eigen::aligned_allocator<PCD>
 		target = data_temp[i].cloud; //目标点云
 		PointCloud::Ptr temptest(new PointCloud); //创建临时点云指针
 		//pcl::transformPointCloud(*temptest, *target, (-(Eigen_translation - Eigen::Matrix4f::Identity())*(risingDistance - 0.1) + Eigen::Matrix4f::Identity()));
+		CvMatToMatrix4fzk(&Eigen_translation, &translation);
+		cout << Eigen_translation;
 		RisingTransform = -(Eigen_translation - Eigen::Matrix4f::Identity())*risingDistance + Eigen::Matrix4f::Identity();
 		roughTranslation(source, RisingTransform, 1);//将1点云移动到下一点云的位置		
 

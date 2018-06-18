@@ -11,7 +11,7 @@ extern CvMat translation;//设备上升方向
 extern int horizontalScanNum;//水平采集点云数（设备数）
 extern int verticalScanNum;//竖直采集点云数（上升次数
 extern float risingDistance;//每次移动的距离
-
+extern std::string horizontalFileName[12];
 void Get_ConfigArgv();
 void Get_extrinsic();
 

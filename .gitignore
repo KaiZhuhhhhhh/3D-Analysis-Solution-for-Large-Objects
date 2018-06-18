@@ -22,3 +22,4 @@ PointCloudRegistration/PointCloudRegistration/PointCloudRegistration.vcxproj.use
 PointCloudRegistration/PointCloudRegistration.opensdf
 PointCloudRegistration/PointCloudRegistration.sdf
 PointCloudRegistration/PointCloudRegistration/PointCloudRegistration.vcxproj
+*.ply

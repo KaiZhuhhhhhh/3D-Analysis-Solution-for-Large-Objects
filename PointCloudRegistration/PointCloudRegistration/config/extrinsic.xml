@@ -1,24 +1,21 @@
 <?xml version="1.0"?>
 <opencv_storage>
-<!--extrinsic1 表示从1号设备到2号设备的空间变换矩阵1T2-->
-<extrinsic1 type_id="opencv-matrix">
-  <rows>4</rows>
-  <cols>4</cols>
-  <dt>d</dt>
-  <data>
-    1.0 0.0 0.0 0.5
-    0.0 1.0 0.0 0.5
-    0.0 0.0 1.0 0.5
-    0.0 0.0 0.0 0.1</data></extrinsic1>
 <translation type_id="opencv-matrix">
   <rows>4</rows>
   <cols>4</cols>
-  <dt>d</dt>
+  <dt>f</dt>
   <data>
-    1.0 0.0 0.0 0.5
-    0.0 1.0 0.0 10.5
-    0.0 0.0 1.0 0.5
-    0.0 0.0 0.0 0.1</data></translation>
-
-
+    9.99998987e-001 1.11687998e-003 1.32484001e-003 1.00612998e-001
+    -1.11570000e-003 9.99998987e-001 -8.85686022e-004 2.78250999e+001
+    -1.32583000e-003 8.84207024e-004 9.99998987e-001 -3.30156994e+000 0.
+    0. 0. 1.</data></translation>
+<extrinsic1 type_id="opencv-matrix">
+  <rows>4</rows>
+  <cols>4</cols>
+  <dt>f</dt>
+  <data>
+    -8.37853014e-001 1.90220997e-001 5.11681974e-001 -3.58140991e+002
+    6.92631006e-002 9.66793001e-001 -2.45996997e-001 1.11579002e+002
+    -5.41485012e-001 -1.70669004e-001 -8.23204994e-001 1.17556006e+003
+    0. 0. 0. 1.</data></extrinsic1>
 </opencv_storage>

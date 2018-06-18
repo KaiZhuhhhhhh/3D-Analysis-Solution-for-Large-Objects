@@ -3,11 +3,11 @@
 #include <iostream>
 #include <fstream>
 #include<string>
-
+#include "WriteCvmat.h"
 #include "config.h"
 #include "Calibrate.h"
 #include "PairAlign.h"
-
+#include "pointCloudProcess.h"
 //extrinsic1 表示从1号设备到2号设备的空间变换矩阵1T2
 CvMat extrinsic[12];//[0]:将1号点云移动到2号
 //Eigen::Matrix4f Eigen_extrinsic[12];
@@ -16,9 +16,11 @@ CvMat translation;//设备上升方向
 int horizontalScanNum;//水平采集点云数（设备数）
 int verticalScanNum;//竖直采集点云数（上升次数
 float risingDistance;//每次移动的距离
+std::string horizontalFileName[12];
 
 void Get_ConfigArgv(){
 	CvFileStorage *fs;
+	CvFileNode* m;
 	fs = cvOpenFileStorage("./config/config.xml", 0, CV_STORAGE_READ);
 
 	board_size.width = cvReadIntByName(fs, 0, "board_width", 0);
@@ -42,21 +44,36 @@ void Get_ConfigArgv(){
 	verticalScanNum = cvReadIntByName(fs, NULL, "verticalScanNum");
 	risingDistance = cvReadRealByName(fs, NULL, "risingDistance");
 
+	m= cvGetFileNodeByName(fs, 0, "loadData");
+	pCP.LeafSize = cvReadRealByName(fs, m, "LeafSize");
+	pCP.MeanK = cvReadIntByName(fs, m, "MeanK");
+	pCP.StddevMulThresh=cvReadRealByName(fs, m, "StddevMulThresh");
+	pCP.filter_flag = cvReadIntByName(fs, m, "filter_flag");
+	pCP.downsample_flag = cvReadIntByName(fs, m, "downsample_flag");
+
+	for (int i = 1; i <= horizontalScanNum; i++){
+		horizontalFileName[i - 1] = std::to_string(i) + "_point_cloud.ply";		
+	}
+
 	cvReleaseFileStorage(&fs);
 }
 
 void Get_extrinsic(){
+	writeCvmat();
 	CvFileStorage *fs;
 	fs = cvOpenFileStorage("./config/extrinsic.xml", 0, CV_STORAGE_READ);
-
 	translation = *(CvMat *)cvReadByName(fs, NULL, "translation");
+	for (int i = 0; i < translation.rows; i++)
+	{ 
+		for (int j = 0; j < translation.cols; j++)
+		{
+			printf("mat[%d][%d] = %f\n", i, j, *(translation.data.fl + j + i * translation.rows));
+		}
+		cout << endl;
+	}
 	for (int i = 1; i <= 1;i++){
 		std::string ex_mat = "extrinsic" + std::to_string(i);
 		extrinsic[i-1] = *(CvMat *)cvReadByName(fs, NULL, ex_mat.c_str());
 	}
 	cvReleaseFileStorage(&fs);	
 }
-
-
-
-
