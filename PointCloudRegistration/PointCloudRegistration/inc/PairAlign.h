@@ -80,6 +80,6 @@ void roughTranslation(PointCloud::Ptr cloud, Eigen::Matrix4f &T, int n );
 
 void AccurateRegistration2(std::vector<PCD, Eigen::aligned_allocator<PCD> > &data_temp);
 
-void HorizontalAccurateRegistration(std::vector<PCD, Eigen::aligned_allocator<PCD> > &data_temp);
-void VerticalAccurateRegistration(std::vector<PCD, Eigen::aligned_allocator<PCD> > &data_temp);
+void HorizontalAccurateRegistration(std::vector<PCD, Eigen::aligned_allocator<PCD> > &data_temp, std::string outputName);
+void VerticalAccurateRegistration(std::vector<PCD, Eigen::aligned_allocator<PCD> > &data_temp, std::string outputName = "1");
 #endif

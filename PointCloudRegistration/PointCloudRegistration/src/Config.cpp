@@ -16,7 +16,8 @@ CvMat translation;//设备上升方向
 int horizontalScanNum;//水平采集点云数（设备数）
 int verticalScanNum;//竖直采集点云数（上升次数
 float risingDistance;//每次移动的距离
-std::string horizontalFileName[12];
+std::string horizontalFileName[6][12];
+std::string verticalFileName[6];
 
 void Get_ConfigArgv(){
 	CvFileStorage *fs;
@@ -51,10 +52,12 @@ void Get_ConfigArgv(){
 	pCP.filter_flag = cvReadIntByName(fs, m, "filter_flag");
 	pCP.downsample_flag = cvReadIntByName(fs, m, "downsample_flag");
 
-	for (int i = 1; i <= horizontalScanNum; i++){
-		horizontalFileName[i - 1] = std::to_string(i) + "_point_cloud.ply";		
+	for (int j = 1; j <= verticalScanNum; j++){
+		for (int i = 1; i <= horizontalScanNum; i++){
+			horizontalFileName[j - 1][i - 1] = "./OriginalPointCloud/" + std::to_string(j) +"_layer/"+ std::to_string(i) + "_point_cloud.ply";
+		}
+		verticalFileName[j - 1] = "./HorizontalResult/" + std::to_string(j) + "_layer.ply";
 	}
-
 	cvReleaseFileStorage(&fs);
 }
 

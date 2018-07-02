@@ -98,8 +98,8 @@ void showCloudsLeft(const PointCloud::Ptr cloud_target, const PointCloud::Ptr cl
 	PointCloudColorHandlerCustom<PointT> src_h(cloud_source, 255, 0, 0); //源点云红色
 	p->addPointCloud(cloud_target, tgt_h, "vp1_target", vp_1); //加载点云
 	p->addPointCloud(cloud_source, src_h, "vp1_source", vp_1);
-	PCL_INFO("Press q to begin the registration.\n"); //在命令行中显示提示信息
-	p->spin();
+	//PCL_INFO("Press q to begin the registration.\n"); //在命令行中显示提示信息
+	//p->spin();
 }
 
 
@@ -419,10 +419,10 @@ std:cin >> s;
 	//	pcl::io::savePCDFile(ss.str(), *result); //保存成对的配准结果
 }
 
-void HorizontalAccurateRegistration(std::vector<PCD, Eigen::aligned_allocator<PCD> > &data_temp)//将1移动到2再icp拼接，在将结果移动到3与3icp
+void HorizontalAccurateRegistration(std::vector<PCD, Eigen::aligned_allocator<PCD> > &data_temp, std::string outputName = "1")//将1移动到2再icp拼接，在将结果移动到3与3icp
 {
 	//创建一个 PCLVisualizer 对象
-	p = new pcl::visualization::PCLVisualizer("Pairwise Incremental Registration example"); //p是全局变量
+	p = new pcl::visualization::PCLVisualizer("Pairwise Incremental Registration - " + outputName); //p是全局变量
 	p->createViewPort(0.0, 0, 0.5, 1.0, vp_1); //创建左视区
 	p->createViewPort(0.5, 0, 1.0, 1.0, vp_2); //创建右视区
 
@@ -480,19 +480,18 @@ void HorizontalAccurateRegistration(std::vector<PCD, Eigen::aligned_allocator<PC
 		//p->removePointCloud("source");
 		//p->removePointCloud("target");
 	}
-	char s[30];
-	std::cout << "输入保存文件名：" << endl;
-std:cin >> s;
+	
+	std::cout << "保存文件..." << endl;
 	std::stringstream output_filename; //这两句是生成文件名
-	output_filename << ".//result//" << s << ".ply";
+	output_filename << ".//HorizontalResult//" <<outputName<< ".ply";
 	pcl::PLYWriter writer;
 	writer.write(output_filename.str(), *result);
 	//	pcl::io::savePCDFile(ss.str(), *result); //保存成对的配准结果
 }
-void VerticalAccurateRegistration(std::vector<PCD, Eigen::aligned_allocator<PCD> > &data_temp)//将1移动到2再icp拼接，在将结果移动到3与3icp
+void VerticalAccurateRegistration(std::vector<PCD, Eigen::aligned_allocator<PCD> > &data_temp, std::string outputName)//将1移动到2再icp拼接，在将结果移动到3与3icp
 {
 	//创建一个 PCLVisualizer 对象
-	p = new pcl::visualization::PCLVisualizer("Pairwise Incremental Registration example"); //p是全局变量
+	p = new pcl::visualization::PCLVisualizer("Pairwise Incremental Registration - Vertical"); //p是全局变量
 	p->createViewPort(0.0, 0, 0.5, 1.0, vp_1); //创建左视区
 	p->createViewPort(0.5, 0, 1.0, 1.0, vp_2); //创建右视区
 
@@ -550,7 +549,7 @@ void VerticalAccurateRegistration(std::vector<PCD, Eigen::aligned_allocator<PCD>
 	}
 	char s[30];
 	std::cout << "输入保存文件名：" << endl;
-std:cin >> s;
+	std:cin >> s;
 	std::stringstream output_filename; //这两句是生成文件名
 	output_filename << ".//result//" << s << ".ply";
 	pcl::PLYWriter writer;

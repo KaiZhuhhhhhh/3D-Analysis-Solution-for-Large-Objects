@@ -10,12 +10,15 @@ cvStructuredLight/cvStructuredLight/opencv_release.props
 cvStructuredLight/cvStructuredLight/opencv2410_x86_debug.props
 
 PointCloudRegistration/Debug/
+PointCloudRegistration/Release/
 PointCloudRegistration/ipch/
 PointCloudRegistration/PointCloudRegistration.v12.suo
 PointCloudRegistration/PointCloudRegistration/Debug/
 PointCloudRegistration/PointCloudRegistration/result/
 
 *.props
+*.obj
+*.pdb
 
 PointCloudRegistration/PointCloudRegistration/PointCloudRegistration.vcxproj.filters
 PointCloudRegistration/PointCloudRegistration/PointCloudRegistration.vcxproj.user
@@ -23,3 +26,5 @@ PointCloudRegistration/PointCloudRegistration.opensdf
 PointCloudRegistration/PointCloudRegistration.sdf
 PointCloudRegistration/PointCloudRegistration/PointCloudRegistration.vcxproj
 *.ply
+PointCloudRegistration/PointCloudRegistration/Release/PointCloudRegistration.pch
+PointCloudRegistration/PointCloudRegistration/Release/PointCloudRegistration.log

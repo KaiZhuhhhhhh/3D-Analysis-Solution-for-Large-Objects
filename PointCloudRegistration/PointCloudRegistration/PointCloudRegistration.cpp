@@ -21,13 +21,15 @@ int _tmain(int argc, char** argv)
 	Get_extrinsic();
 	Get_ConfigArgv();
 	std::vector<PCD, Eigen::aligned_allocator<PCD> > data; //模型
-	loadData2(horizontalScanNum, horizontalFileName , data); //读取pcd文件数据，定义见上面	
-	HorizontalAccurateRegistration(data);
-
+	for (int j = 1; j <= verticalScanNum; j++){
+		std::string outputName = std::to_string(j)+"_layer";
+		loadData2(horizontalScanNum, horizontalFileName[j-1], data); //读取pcd文件数据，定义见上面	
+		HorizontalAccurateRegistration(data, outputName);
+		data.clear();
+	}
+	
+	loadData2(horizontalScanNum, verticalFileName, data);
 	VerticalAccurateRegistration(data);
-	//AccurateRegistration2(data);//精细拼接
-
+	data.clear();
 	return 0;
 }
-
-/*问题日志：矩阵读取错误*/
