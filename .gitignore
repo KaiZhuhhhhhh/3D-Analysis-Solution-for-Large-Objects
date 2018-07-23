@@ -15,6 +15,10 @@ PointCloudRegistration/ipch/
 PointCloudRegistration/PointCloudRegistration.v12.suo
 PointCloudRegistration/PointCloudRegistration/Debug/
 PointCloudRegistration/PointCloudRegistration/result/
+PointCloudRegistration/PointCloudRegistration/Calibration/
+PointCloudRegistration/PointCloudRegistration/HorizontalResult/
+PointCloudRegistration/PointCloudRegistration/OriginalPointCloud/
+
 
 *.props
 *.obj

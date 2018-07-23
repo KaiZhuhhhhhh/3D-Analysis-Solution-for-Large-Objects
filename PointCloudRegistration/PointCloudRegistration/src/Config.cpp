@@ -24,16 +24,22 @@ void Get_ConfigArgv(){
 	CvFileNode* m;
 	fs = cvOpenFileStorage("./config/config.xml", 0, CV_STORAGE_READ);
 
+	camera_width = cvReadIntByName(fs, 0, "camera_width", 0);
+	camera_height = cvReadIntByName(fs, 0, "camera_height", 0);
 	board_size.width = cvReadIntByName(fs, 0, "board_width", 0);
 	board_size.height = cvReadIntByName(fs, 0, "board_height", 0);
-	square_size.width = cvReadRealByName(fs, NULL, "board_width");
-	square_size.height = cvReadRealByName(fs, NULL, "board_height");
+	square_size.width = cvReadRealByName(fs, NULL, "square_length");
+	square_size.height = cvReadRealByName(fs, NULL, "square_height");
 	total_clude = cvReadIntByName(fs, 0, "cludenum", 0);
 	Registration_flag = cvReadIntByName(fs, 0, "Registration_flag",0);
 	HorizontalRegistrationModel = cvReadIntByName(fs, NULL, "HorizontalRegistrationModel");
 	VerticalRegistrationModel = cvReadIntByName(fs, NULL, "VerticalRegistrationModel");
 
-	Camera_ID == cvReadIntByName(fs, 0, "Camera_ID", 0);
+	Camera_ID[0] = cvReadIntByName(fs, 0, "Camera_ID_1", 0);
+	Camera_ID[1] = cvReadIntByName(fs, 0, "Camera_ID_2", 0);
+	Camera_ID[2] = cvReadIntByName(fs, 0, "Camera_ID_3", 0);
+	Camera_ID[3] = cvReadIntByName(fs, 0, "Camera_ID_4", 0);
+
 	KSearchnum = cvReadIntByName(fs, 0, "KSearchnum", 0);
 	MaxCorrespondenceDistance = cvReadRealByName(fs, NULL, "MaxCorrespondenceDistance"); //对应点之间的最大距离（0.1）, 在配准过程中，忽略大于该阈值的点
 	LeafSize = cvReadRealByName(fs, NULL, "LeafSize");
@@ -66,14 +72,10 @@ void Get_extrinsic(){
 	CvFileStorage *fs;
 	fs = cvOpenFileStorage("./config/extrinsic.xml", 0, CV_STORAGE_READ);
 	translation = *(CvMat *)cvReadByName(fs, NULL, "translation");
-	for (int i = 0; i < translation.rows; i++)
-	{ 
-		for (int j = 0; j < translation.cols; j++)
-		{
-			printf("mat[%d][%d] = %f\n", i, j, *(translation.data.fl + j + i * translation.rows));
-		}
-		cout << endl;
-	}
+	cv::Mat a;
+	a = &translation;
+	cout << "scanner_translation:" << a << endl;
+
 	for (int i = 1; i <= 1;i++){
 		std::string ex_mat = "extrinsic" + std::to_string(i);
 		extrinsic[i-1] = *(CvMat *)cvReadByName(fs, NULL, ex_mat.c_str());

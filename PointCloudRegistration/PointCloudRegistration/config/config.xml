@@ -7,24 +7,30 @@
   <MeanK>80</MeanK>
   <StddevMulThresh>0.2</StddevMulThresh></loadData>
 
-<board_width>7</board_width>
-<board_height>8</board_height>
-<square_length>20</square_length>
-<square_height>20</square_height>
+ <camera_width>960</camera_width>
+ <camera_height>720</camera_height>
+<board_width>9</board_width>
+<board_height>6</board_height>
+<square_length>15</square_length>
+<square_height>15</square_height>
 <cludenum>2</cludenum>
 
 <horizontalScanNum>2</horizontalScanNum>
-<verticalScanNum>2</verticalScanNum>
+<verticalScanNum>1</verticalScanNum>
 <risingDistance>1</risingDistance>
 
-<HorizontalRegistrationModel>0</HorizontalRegistrationModel>
+ <!-- 0:Rough 1:ICP-->
+<HorizontalRegistrationModel>1</HorizontalRegistrationModel>
 <VerticalRegistrationModel>0</VerticalRegistrationModel>
-<Camera_ID>0</Camera_ID>
-<KSearchnum>30</KSearchnum>
-<MaxCorrespondenceDistance>0.5</MaxCorrespondenceDistance>
+<Camera_ID_1>3</Camera_ID_1>
+<Camera_ID_2>4</Camera_ID_2>
+<Camera_ID_3>1</Camera_ID_3>
+<Camera_ID_4>0</Camera_ID_4>
+<KSearchnum>300</KSearchnum>
+<MaxCorrespondenceDistance>10</MaxCorrespondenceDistance>
 <LeafSize>0.5</LeafSize>
-<TransformationEpsilon>1e-2</TransformationEpsilon>
-<downsample_flag>1</downsample_flag>
-<Cali_Pic_Num>3</Cali_Pic_Num>
+<TransformationEpsilon>1e-3</TransformationEpsilon>
+<downsample_flag>0</downsample_flag>
+<Cali_Pic_Num>2</Cali_Pic_Num>
 
 </opencv_storage>

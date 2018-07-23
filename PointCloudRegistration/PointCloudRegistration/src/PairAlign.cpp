@@ -224,7 +224,8 @@ void roughTranslation(PointCloud::Ptr cloud, Eigen::Matrix4f &T,int n=1)//粗略的
 	Eigen::Matrix4f T_temp=Eigen::Matrix4f::Identity();
 	PointCloud::Ptr temp(new PointCloud); //创建临时点云指针
 	*temp = *cloud;
-	T_temp = T_temp*T;	
+	T_temp = T_temp*T;
+	cout <<"点云变换矩阵"<< T_temp << endl;
 	pcl::transformPointCloud(*temp, *cloud, T_temp);
 }
 
