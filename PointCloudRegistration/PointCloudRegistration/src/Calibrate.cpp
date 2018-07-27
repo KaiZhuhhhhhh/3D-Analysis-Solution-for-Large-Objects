@@ -331,7 +331,7 @@ int find_rotation_mat(char  cali_flag)
 			fs2 = cvOpenFileStorage("./Calibration/scanner_extrinsic.xml", 0, CV_STORAGE_WRITE);//清空原有的
 		}
 		else{
-			fs2 = cvOpenFileStorage("./Calibration/scanner_extrinsic.xml", 0, CV_STORAGE_APPEND);
+			fs2 = cvOpenFileStorage("./Calibration/scanner_extrinsic.xml", 0, CV_STORAGE_APPEND);//追加
 		}
 		cvWrite(fs2, matName.c_str(), T_Mat);
 		cvReleaseFileStorage(&fs2);
@@ -366,7 +366,7 @@ void get_rotation_mat(){
 		string extrinsicMatName;
 		fs0 = cvOpenFileStorage("./Calibration/scanner_extrinsic.xml", 0, CV_STORAGE_READ);
 		for (int i = 1; i < horizontalScanNum; i++){
-			extrinsicMatName = "extrinsic" + to_string(i) + to_string(i + 1) + to_string(i);
+			extrinsicMatName = "extrinsic" + to_string(i) + to_string(i + 1) + to_string(i);//相机坐标系下描述标定板坐标系，即上标为相机
 			temp0 = (CvMat *)cvReadByName(fs0, NULL, extrinsicMatName.c_str());
 			a = temp0;
 			std::cout << extrinsicMatName << ":" << a << endl;

@@ -14,6 +14,7 @@ PointCloudRegistration/Release/
 PointCloudRegistration/ipch/
 PointCloudRegistration/PointCloudRegistration.v12.suo
 PointCloudRegistration/PointCloudRegistration/Debug/
+PointCloudRegistration/PointCloudRegistration/Release/
 PointCloudRegistration/PointCloudRegistration/result/
 PointCloudRegistration/PointCloudRegistration/Calibration/
 PointCloudRegistration/PointCloudRegistration/HorizontalResult/
@@ -32,3 +33,7 @@ PointCloudRegistration/PointCloudRegistration/PointCloudRegistration.vcxproj
 *.ply
 PointCloudRegistration/PointCloudRegistration/Release/PointCloudRegistration.pch
 PointCloudRegistration/PointCloudRegistration/Release/PointCloudRegistration.log
+PointCloudRegistration/PointCloudRegistration/Release/PointClo.18AEBE52.tlog
+*.tlog
+*.tlog
+PointCloudRegistration/PointCloudRegistration/Release/PointClo.18AEBE52.tlog/CL.read.1.tlog

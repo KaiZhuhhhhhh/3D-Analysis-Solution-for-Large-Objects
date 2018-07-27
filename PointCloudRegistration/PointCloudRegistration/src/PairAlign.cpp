@@ -89,6 +89,17 @@ void CvMatToMatrix4fzk(Eigen::Matrix4f *pcl_T, CvMat *cv_T)
 	}
 }
 
+void Matrix4fToCvMatzk(CvMat *cv_T,Eigen::Matrix4f *pcl_T)
+{
+	for (int i = 0; i < 4; i++)
+	{
+		for (int j = 0; j < 4; j++)
+		{
+			CV_MAT_ELEM(*cv_T, float, i, j)=(*pcl_T)(i, j);
+		}
+	}
+}
+
 //在窗口的左视区，简单的显示源点云和目标点云
 void showCloudsLeft(const PointCloud::Ptr cloud_target, const PointCloud::Ptr cloud_source)
 {
@@ -459,10 +470,35 @@ void HorizontalAccurateRegistration(std::vector<PCD, Eigen::aligned_allocator<PC
 
 		if (HorizontalRegistrationModel==1)
 		{
-			//配准2个点云，函数定义见上面
+			CvMat  *ICP_extrinsic=cvCreateMat(4, 4, CV_32FC1);// = cvCreateMat(4, 4, CV_32FC1);;
+			CvFileStorage *fsicp;
+			string ICPextrinsicMatName;
+			//配准2个点云，函数定义见上面,pairTransform表示将source移动到target（target坐标系下描述source坐标系）
 			pairAlign(target, source, result, pairTransform, downsample_flag);//temp就是将src拼在target合并的点云
+			Matrix4fToCvMatzk(ICP_extrinsic,&pairTransform);
+			if (i == 1){
+				fsicp = cvOpenFileStorage("./Calibration/scanner_ICP_extrinsic.xml", 0, CV_STORAGE_WRITE);//清空原有的
+			}
+			else{
+				fsicp = cvOpenFileStorage("./Calibration/scanner_ICP_extrinsic.xml", 0, CV_STORAGE_APPEND);//追加
+			}
+			ICPextrinsicMatName = "Horizontal_ICP_extrinsic" + to_string(i) + to_string(i+1);
+			cvWrite(fsicp, ICPextrinsicMatName.c_str(), ICP_extrinsic);
+			cvReleaseFileStorage(&fsicp);
 		}
-		else if (HorizontalRegistrationModel == 0)
+		else if (HorizontalRegistrationModel == 2)
+		{
+			Eigen::Matrix4f Horizontal_ICP_extrinsic;
+			CvMat  *readICP_extrinsic = cvCreateMat(4, 4, CV_32FC1);;// = cvCreateMat(4, 4, CV_32FC1);;
+			CvFileStorage *fsicpread;
+			string readICPextrinsicMatName;
+			fsicpread = cvOpenFileStorage("./Calibration/scanner_ICP_extrinsic.xml", 0, CV_STORAGE_READ);
+			readICPextrinsicMatName = "Horizontal_ICP_extrinsic" + to_string(i) + to_string(i + 1);
+			readICP_extrinsic = (CvMat *)cvReadByName(fsicpread, NULL, readICPextrinsicMatName.c_str());
+			CvMatToMatrix4fzk(&Horizontal_ICP_extrinsic, readICP_extrinsic);
+			roughTranslation(source, Horizontal_ICP_extrinsic, 1);//将1点云移动到下一点云的位置
+			*result = *source + *target;
+		}else if (HorizontalRegistrationModel == 0)
 		{
 			*result = *source + *target;
 		}
@@ -481,7 +517,13 @@ void HorizontalAccurateRegistration(std::vector<PCD, Eigen::aligned_allocator<PC
 		//p->removePointCloud("source");
 		//p->removePointCloud("target");
 	}
-	
+	pcl::VoxelGrid<PointT> grid; //VoxelGrid 把一个给定的点云，聚集在一个局部的3D网格上,并下采样和滤波点云数据
+
+	grid.setLeafSize(pCP.LeafSize, pCP.LeafSize, pCP.LeafSize); //设置体元网格的叶子大小
+	//下采样 结果点云
+	grid.setInputCloud(result); //设置输入点云
+	grid.filter(*result); //下采样和滤波，并存储在src中
+
 	std::cout << "保存文件..." << endl;
 	std::stringstream output_filename; //这两句是生成文件名
 	output_filename << ".//HorizontalResult//" <<outputName<< ".ply";
@@ -526,10 +568,35 @@ void VerticalAccurateRegistration(std::vector<PCD, Eigen::aligned_allocator<PCD>
 
 		if (VerticalRegistrationModel == 1)
 		{
-			//配准2个点云，函数定义见上面
+						CvMat  *ICP_extrinsic=cvCreateMat(4, 4, CV_32FC1);// = cvCreateMat(4, 4, CV_32FC1);;
+			CvFileStorage *fsicp;
+			string ICPextrinsicMatName;
+			//配准2个点云，函数定义见上面,pairTransform表示将source移动到target（target坐标系下描述source坐标系）
 			pairAlign(target, source, result, pairTransform, downsample_flag);//temp就是将src拼在target合并的点云
+			Matrix4fToCvMatzk(ICP_extrinsic, &pairTransform);
+			if (i == 1){
+				fsicp = cvOpenFileStorage("./Calibration/scanner_ICP_extrinsic.xml", 0, CV_STORAGE_WRITE);//清空原有的
+			}
+			else{
+				fsicp = cvOpenFileStorage("./Calibration/scanner_ICP_extrinsic.xml", 0, CV_STORAGE_APPEND);//追加
+			}
+			ICPextrinsicMatName = "Vertical_ICP_extrinsic" + to_string(i) + to_string(i+1);
+			cvWrite(fsicp, ICPextrinsicMatName.c_str(), ICP_extrinsic);
+			cvReleaseFileStorage(&fsicp);
 		}
-		else if (VerticalRegistrationModel == 0)
+		else if (HorizontalRegistrationModel == 2)
+		{
+			Eigen::Matrix4f Horizontal_ICP_extrinsic;
+			CvMat  *readICP_extrinsic = cvCreateMat(4, 4, CV_32FC1);;// = cvCreateMat(4, 4, CV_32FC1);;
+			CvFileStorage *fsicpread;
+			string readICPextrinsicMatName;
+			fsicpread = cvOpenFileStorage("./Calibration/scanner_ICP_extrinsic.xml", 0, CV_STORAGE_READ);
+			readICPextrinsicMatName = "Horizontal_ICP_extrinsic" + to_string(i) + to_string(i + 1);
+			readICP_extrinsic = (CvMat *)cvReadByName(fsicpread, NULL, readICPextrinsicMatName.c_str());
+			CvMatToMatrix4fzk(&Horizontal_ICP_extrinsic, readICP_extrinsic);
+			roughTranslation(source, Horizontal_ICP_extrinsic, 1);//将1点云移动到下一点云的位置
+			*result = *source + *target;
+		}else if (VerticalRegistrationModel == 0)
 		{
 			*result = *source + *target;
 		}
@@ -554,6 +621,6 @@ void VerticalAccurateRegistration(std::vector<PCD, Eigen::aligned_allocator<PCD>
 	std::stringstream output_filename; //这两句是生成文件名
 	output_filename << ".//result//" << s << ".ply";
 	pcl::PLYWriter writer;
-	writer.write(output_filename.str(), *result);
+	writer.write(output_filename.str(), *result,true);
 	//	pcl::io::savePCDFile(ss.str(), *result); //保存成对的配准结果
 }

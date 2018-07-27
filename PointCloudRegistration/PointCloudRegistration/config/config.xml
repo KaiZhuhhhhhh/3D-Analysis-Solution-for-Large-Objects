@@ -10,17 +10,17 @@
  <camera_width>960</camera_width>
  <camera_height>720</camera_height>
 <board_width>9</board_width>
-<board_height>6</board_height>
-<square_length>15</square_length>
-<square_height>15</square_height>
+<board_height>7</board_height>
+<square_length>30</square_length>
+<square_height>30</square_height>
 <cludenum>2</cludenum>
 
 <horizontalScanNum>2</horizontalScanNum>
 <verticalScanNum>1</verticalScanNum>
 <risingDistance>1</risingDistance>
 
- <!-- 0:Rough 1:ICP-->
-<HorizontalRegistrationModel>1</HorizontalRegistrationModel>
+ <!-- 0:Rough 1:ICP 2:using ICP extrinsic-->
+<HorizontalRegistrationModel>2</HorizontalRegistrationModel>
 <VerticalRegistrationModel>0</VerticalRegistrationModel>
 <Camera_ID_1>3</Camera_ID_1>
 <Camera_ID_2>4</Camera_ID_2>
