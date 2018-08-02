@@ -31,5 +31,6 @@ void inputCameraParam(CvMat * intrinsic_matrix1, CvMat * distortion_coeffs1, CvM
 void caculate_Tmat(CvMat * r_vec, CvMat * t_vec, CvMat * T_mat);
 int find_rotation_mat();
 void get_rotation_mat();
+void get_translation_mat();
 
 #endif

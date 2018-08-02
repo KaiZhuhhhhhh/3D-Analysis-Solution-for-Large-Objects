@@ -544,6 +544,7 @@ void VerticalAccurateRegistration(std::vector<PCD, Eigen::aligned_allocator<PCD>
 	//逗号表达式，先创建一个单位矩阵，然后将成对变换 赋给 全局变换
 	Eigen::Matrix4f pairTransform;//GlobalTransform = Eigen::Matrix4f::Identity(), 
 	Eigen::Matrix4f RisingTransform;
+	Eigen::Matrix4f transToFirstLayer;
 
 	//精拼接，遍历所有的点云文件
 	//	PointCloud::Ptr temp(new PointCloud); //创建临时点云指针
@@ -556,7 +557,7 @@ void VerticalAccurateRegistration(std::vector<PCD, Eigen::aligned_allocator<PCD>
 		//pcl::transformPointCloud(*temptest, *target, (-(Eigen_translation - Eigen::Matrix4f::Identity())*(risingDistance - 0.1) + Eigen::Matrix4f::Identity()));
 		CvMatToMatrix4fzk(&Eigen_translation, &translation);
 		cout << Eigen_translation;
-		RisingTransform = -(Eigen_translation - Eigen::Matrix4f::Identity())*risingDistance + Eigen::Matrix4f::Identity();
+		RisingTransform = Eigen_translation*risingDistance + Eigen::Matrix4f::Identity();
 		roughTranslation(source, RisingTransform, 1);//将1点云移动到下一点云的位置		
 
 		showCloudsLeft(source, target); //在左视区，简单的显示源点云和目标点云		
@@ -615,6 +616,9 @@ void VerticalAccurateRegistration(std::vector<PCD, Eigen::aligned_allocator<PCD>
 		//p->removePointCloud("source");
 		//p->removePointCloud("target");
 	}
+	RisingTransform = Eigen_translation*risingDistance*(verticalScanNum-1) + Eigen::Matrix4f::Identity();
+	transToFirstLayer = RisingTransform.inverse();
+	roughTranslation(source, transToFirstLayer, 1);//移动回第一层点云(最后一个相机)	
 	char s[30];
 	std::cout << "输入保存文件名：" << endl;
 	std:cin >> s;

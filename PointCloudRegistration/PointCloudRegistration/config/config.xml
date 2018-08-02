@@ -15,12 +15,12 @@
 <square_height>30</square_height>
 <cludenum>2</cludenum>
 
-<horizontalScanNum>2</horizontalScanNum>
-<verticalScanNum>1</verticalScanNum>
+<horizontalScanNum>4</horizontalScanNum>
+<verticalScanNum>3</verticalScanNum>
 <risingDistance>1</risingDistance>
 
  <!-- 0:Rough 1:ICP 2:using ICP extrinsic-->
-<HorizontalRegistrationModel>2</HorizontalRegistrationModel>
+<HorizontalRegistrationModel>0</HorizontalRegistrationModel>
 <VerticalRegistrationModel>0</VerticalRegistrationModel>
 <Camera_ID_1>3</Camera_ID_1>
 <Camera_ID_2>4</Camera_ID_2>

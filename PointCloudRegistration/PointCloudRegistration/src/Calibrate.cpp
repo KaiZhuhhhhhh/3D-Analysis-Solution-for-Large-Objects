@@ -350,12 +350,228 @@ int find_rotation_mat(char  cali_flag)
 	cvReleaseMat(&T_Mat);
 }
 
+int find_translation_mat(char  cali_flag)
+{
+	char rise_hight[10];
+
+	int number_image = 2;
+	char *str1;
+	str1 = ".jpg";
+	char filename[50] = "";
+
+	float square_length = square_size.width;                //方格长度
+	float square_height = square_size.height;                //方格高度
+	int board_width = board_size.width;   //每行角点数
+	int board_height = board_size.height;  //每列角点数
+	int total_per_image = board_width*board_height;  //每张图片角点总数
+
+	cout << "请输入上升高度：" << endl;
+	cin >> rise_hight;
+
+	if (cali_flag == '1')
+	{
+		CvCapture* capture;
+		capture = cvCreateCameraCapture(Camera_ID[3]);
+		cvSetCaptureProperty(capture, CV_CAP_PROP_FRAME_WIDTH, camera_width);
+		cvSetCaptureProperty(capture, CV_CAP_PROP_FRAME_HEIGHT, camera_height);
+		if (capture == 0)
+		{
+			printf("无法捕获摄像头设备！\n\n");
+			return 0;
+		}
+		else
+		{
+			printf("捕获摄像头设备成功！！\n\n");
+		}
+
+		IplImage* frame = NULL;
+
+		cvNamedWindow("摄像机帧截取窗口", 1);
+
+		printf("按“C”键截取当前帧并保存为标定图片...\n按“Q”键退出截取帧过程...\n\n");
+
+
+		for (int i = 0; i < number_image; i++)
+		{
+			while (1){
+				frame = cvQueryFrame(capture);
+				if (!frame)
+					break;
+				cvShowImage("摄像机帧截取窗口", frame);
+
+				if (cvWaitKey(10) == 'c')
+				{
+					sprintf_s(filename, ".//Calibration//translation%d.jpg", i);
+					cvSaveImage(filename, frame);
+					cout << "成功获取当前帧，并以文件名" << filename << "保存...\n\n";
+					printf("按“C”键截取当前帧并保存为标定图片...\n");
+					
+					cout << "请抬升扫描仪，然后再拍照：" << endl;
+					break;
+				}
+				//else if (cvWaitKey(10) == 'q')
+				//{
+				//	printf("截取图像帧过程完成...\n\n");
+				//	cout << "共成功截取" << --number_image << "帧图像！！\n\n";
+				//	break;
+				//}
+			}
+		}
+
+		cvDestroyWindow("摄像机帧截取窗口");
+		//	cvReleaseImage(&frame);
+		cvReleaseCapture(&capture);
+	}
+
+	IplImage * show;
+	cvNamedWindow("RePlay", 1);
+
+	int number_image_copy = number_image;  //复制图像帧数
+
+	int count;  //存储每帧图像中实际识别的角点数
+	int found;        //识别标定板角点的标志位
+	int step;        //存储步长，step=successes*total_per_image;
+	int successes = 0;        //存储成功找到标定板上所有角点的图像帧数
+	int a = 0;        //临时变量，表示在操作第a帧图像
+
+
+	CvPoint2D32f * image_points_buf = new CvPoint2D32f[total_per_image];   //存储角点图像坐标的数组
+	CvMat * image_points = cvCreateMat(number_image*total_per_image, 2, CV_32FC1);        //存储角点的图像坐标的矩阵                
+	CvMat * object_points = cvCreateMat(number_image*total_per_image, 3, CV_32FC1);        //存储角点的三维坐标的矩阵
+	CvMat * point_counts = cvCreateMat(number_image, 1, CV_32SC1);                //存储每帧图像的识别的角点数
+
+	while (a < number_image_copy)
+	{
+		sprintf_s(filename, ".//Calibration//translation%d.jpg", a);
+		show = cvLoadImage(filename, -1);
+
+		found = cvFindChessboardCorners(show, board_size, image_points_buf, &count,
+			CV_CALIB_CB_ADAPTIVE_THRESH | CV_CALIB_CB_FILTER_QUADS);
+		if (found == 0)
+		{
+			cout << "第" << a << "帧图片无法找到棋盘格所有角点!\n\n";
+			cvNamedWindow("RePlay", 1);
+			cvShowImage("RePlay", show);
+			cvWaitKey(0);
+
+		}
+		else
+		{
+			cout << "第" << a << "帧图像成功获得" << count << "个角点...\n";
+
+			cvNamedWindow("RePlay", 1);
+
+			IplImage * gray_image = cvCreateImage(cvGetSize(show), 8, 1);
+			cvCvtColor(show, gray_image, CV_BGR2GRAY);
+			cout << "获取源图像灰度图过程完成...\n";
+			cvFindCornerSubPix(gray_image, image_points_buf, count, cvSize(11, 11), cvSize(-1, -1),
+				cvTermCriteria(CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 30, 0.1));
+			cout << "灰度图亚像素化过程完成...\n";
+			cvDrawChessboardCorners(show, board_size, image_points_buf, count, found);
+			cout << "在源图像上绘制角点过程完成...\n\n";
+			cvShowImage("RePlay", show);
+
+			cvWaitKey(0);
+		}
+
+		if (total_per_image == count)//找到了所有角点
+		{
+			step = successes*total_per_image;
+			for (int i = step, j = 0; j < total_per_image; ++i, ++j)
+			{
+				CV_MAT_ELEM(*image_points, float, i, 0) = image_points_buf[j].x;
+				CV_MAT_ELEM(*image_points, float, i, 1) = image_points_buf[j].y;
+				CV_MAT_ELEM(*object_points, float, i, 0) = (float)((j / board_width)*square_length);//行
+				CV_MAT_ELEM(*object_points, float, i, 1) = (float)((j%board_width)*square_height);//列
+				CV_MAT_ELEM(*object_points, float, i, 2) = 0.0f;
+			}
+			CV_MAT_ELEM(*point_counts, int, successes, 0) = total_per_image;
+			successes++;
+		}
+		a++;
+	}
+	CvSize Pic_size = cvGetSize(show);
+
+	cvReleaseImage(&show);
+	cvDestroyWindow("RePlay");
+
+
+	cout << "*********************************************\n";
+	cout << number_image << "帧图片中，标定成功的图片为" << successes << "帧...\n";
+	cout << number_image << "帧图片中，标定失败的图片为" << number_image - successes << "帧...\n\n";
+	cout << "*********************************************\n\n";
+
+	CvMat * object_points2 = cvCreateMat(total_per_image, 3, CV_32FC1);
+	CvMat * image_points2 = cvCreateMat(total_per_image, 2, CV_32FC1);
+	CvMat * point_counts2 = cvCreateMat(successes, 1, CV_32SC1);
+
+	CvMat * rotation_vec = cvCreateMat(3, 1, CV_32FC1);                //旋转矩阵
+	CvMat * translation_vec = cvCreateMat(3, 1, CV_32FC1);        //平移矩阵
+	CvMat * T_Mat[2];
+	T_Mat[0] = cvCreateMat(4, 4, CV_32FC1);        //平移矩阵
+	T_Mat[1] = cvCreateMat(4, 4, CV_32FC1);        //平移矩阵
+
+	for (int j = 0; j < successes; ++j)
+	{
+		for (int i = 0; i < total_per_image; ++i)
+		{
+			CV_MAT_ELEM(*image_points2, float, i, 0) = CV_MAT_ELEM(*image_points, float, i + j*total_per_image, 0);
+			CV_MAT_ELEM(*image_points2, float, i, 1) = CV_MAT_ELEM(*image_points, float, i + j*total_per_image, 1);
+			CV_MAT_ELEM(*object_points2, float, i, 0) = CV_MAT_ELEM(*object_points, float, i + j*total_per_image, 0);
+			CV_MAT_ELEM(*object_points2, float, i, 1) = CV_MAT_ELEM(*object_points, float, i + j*total_per_image, 1);
+			CV_MAT_ELEM(*object_points2, float, i, 2) = CV_MAT_ELEM(*object_points, float, i + j*total_per_image, 2);
+		}
+		CV_MAT_ELEM(*point_counts2, int, j, 0) = CV_MAT_ELEM(*point_counts, int, j, 0);
+		inputCameraParam(intrinsic_matrix, distortion_coeffs, Cam_extrinsic_matrix, Pro_extrinsic_matrix, 4);
+		cvFindExtrinsicCameraParams2(object_points2, image_points2, intrinsic_matrix, distortion_coeffs, rotation_vec, translation_vec);
+		caculate_Tmat(rotation_vec, translation_vec, T_Mat[j]);//生成齐次变换
+		
+	}
+	CvFileStorage *fs2;
+	CvMat * TranslationMat=cvCreateMat(4, 4, CV_32FC1);        //平移矩阵
+	CvMat* c1Tb_inv = cvCreateMat(4, 4, CV_32FC1);
+	string matName;
+	cv::Mat debug;//调试用
+	cvInvert(T_Mat[0], c1Tb_inv);
+	cvmMul(T_Mat[1], c1Tb_inv, TranslationMat);//把底层移动到上层
+	debug = TranslationMat;
+	cout << "TranslationMat" << debug<<endl;
+	cvConvertScale(TranslationMat, &translation, 1 / atof(rise_hight));
+	for (int i = 0; i < 3; i++)
+	{
+		for (int j = 0; j < 3; j++)
+		{
+			CV_MAT_ELEM(translation, float, i, j) = 0;
+		}
+	}
+	CV_MAT_ELEM(translation, float, 3, 3) = 0;
+	debug = &translation;
+	cout << "translation" << debug << endl;
+	matName = "translation";
+	
+	fs2 = cvOpenFileStorage("./Calibration/translation_extrinsic.xml", 0, CV_STORAGE_WRITE);//清空原有的
+	cvWriteReal(fs2, "rise_hight", atof(rise_hight));
+	cvWrite(fs2, matName.c_str(), &translation);
+
+	cvReleaseFileStorage(&fs2);
+	cvReleaseMat(&object_points);
+	cvReleaseMat(&image_points);
+	cvReleaseMat(&point_counts);
+
+	cvReleaseMat(&object_points2);
+	cvReleaseMat(&image_points2);
+	cvReleaseMat(&point_counts2);
+
+	cvReleaseMat(&rotation_vec);
+	cvReleaseMat(&translation_vec);
+}
+
 void get_rotation_mat(){
 	cv::Mat a;//调试用
 	char caliModel;
-	std::cout << "1 Calibration" << endl;
-	std::cout << "2 Calculate extrinsic from captured picture" << endl;
-	std::cout << "3 Extrinsic matrix existed" << endl;
+	std::cout << "1 Calibration Scanner extrinsic" << endl;
+	std::cout << "2 Calculate scanner extrinsic from captured picture" << endl;
+	std::cout << "3 Scanner Extrinsic matrix existed" << endl;
 	cin >> caliModel;
 
 	if (caliModel != '1' && caliModel != '2' && caliModel != '3'){ cout << "wrong input!" << endl; exit(0); }
@@ -397,5 +613,30 @@ void get_rotation_mat(){
 		extrinsic[i] = *cvCloneMat(scanner_extrinsic);
 		a = &(extrinsic[i]);
 		std::cout << "scanner_extrinsic" << i << i+1<<":" << a << endl;
+	}
+}
+
+void get_translation_mat(){
+	cv::Mat a;//调试用
+	char caliModel;
+	std::cout << "1 Calibration translation" << endl;
+	std::cout << "2 Calculate translation extrinsic from captured picture" << endl;
+	std::cout << "3 Translation Extrinsic matrix existed" << endl;
+	cin >> caliModel;
+
+	if (caliModel != '1' && caliModel != '2' && caliModel != '3'){ cout << "wrong input!" << endl; exit(0); }
+
+	if (caliModel == '3'){
+		CvFileStorage *fs0;
+		string extrinsicMatName;
+		fs0 = cvOpenFileStorage("./Calibration/translation_extrinsic.xml", 0, CV_STORAGE_READ);
+	
+		extrinsicMatName = "translation"  ;//相机坐标系下描述标定板坐标系，即上标为相机
+		translation = *(CvMat *)cvReadByName(fs0, NULL, extrinsicMatName.c_str());
+		a = &translation;
+		std::cout << extrinsicMatName << ":" << a << endl;		
+	}
+	else{
+		find_translation_mat(caliModel);
 	}
 }

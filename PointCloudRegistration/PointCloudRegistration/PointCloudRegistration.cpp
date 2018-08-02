@@ -28,6 +28,7 @@ int _tmain(int argc, char** argv)
 	std::cout << "2 相机位姿标定法" << endl;
 	cin >> getExtrinsic;
 	if(getExtrinsic == '2'){
+		get_translation_mat();
 		get_rotation_mat();
 	}
 	std::vector<PCD, Eigen::aligned_allocator<PCD> > data; //模型
